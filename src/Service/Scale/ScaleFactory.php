@@ -17,7 +17,6 @@ class ScaleFactory
                 $mode = Mode::cases()[array_rand(Mode::cases())];
                 $scale = new DiatonicScale($note);
                 $scale->build();
-                echo $mode->name;
                 if ($mode->value > 0) {
                     $scale->changeMode($mode);
                 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Notation\ScaleName;
+use App\Service\Progression\Progression;
 use App\Service\Scale\ScaleFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,6 +15,7 @@ class MusicController extends AbstractController
     public function getMusicString()
     {
         $m = new ScaleFactory();
-        return new JsonResponse(implode("|", $m->new(ScaleName::Diatonic)->get()));
+        $p = new Progression($m->new(ScaleName::Diatonic)->get());
+        return new JsonResponse(implode("|", $p->getAllChords()));
     }
 }

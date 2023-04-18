@@ -50,8 +50,8 @@ class DiatonicScale implements Scale, ModalScale
     public function changeMode(Mode $mode): Scale
     {
         $modalScale = [];
-            // the -1 corrects the discrepancy between the array index and scale degree
-            $scaleDegree = $mode->value - 1;
+        // the -1 corrects the discrepancy between the array index and scale degree
+        $scaleDegree = $mode->value - 1;
         for ($i = 0; count($modalScale) < count($this->scale); $i++) {
             if ($scaleDegree + 1 < count($this->scale)) {
                 $scaleDegree++;
