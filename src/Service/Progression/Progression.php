@@ -2,6 +2,8 @@
 
 namespace App\Service\Progression;
 
+use App\Notation\Note;
+
 class Progression
 {
     private array $allChords;
@@ -44,5 +46,10 @@ class Progression
     public function getAllChords()
     {
         return $this->allChords;
+    }
+
+    public function analyzeProgression(array $prog)
+    {
+        $allNotes = Note::cases();
     }
 }
