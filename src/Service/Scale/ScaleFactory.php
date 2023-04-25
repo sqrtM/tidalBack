@@ -10,7 +10,6 @@ class ScaleFactory
 {
     public function new(ScaleName $name): Scale
     {
-
         switch ($name) {
             case ScaleName::Diatonic:
                 $note = Note::cases()[array_rand(Note::cases())];
