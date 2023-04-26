@@ -56,37 +56,30 @@ class Progression
         : array_search($n1, Note::cases()) - $root;
     }
 
+    private function getChordQuality(ChordQuality $int1, ChordQuality $int2): string
+    {
+        return match(true) {
+            $int1 === ChordQuality::Minor && $int2 === ChordQuality::Major => ChordQuality::Minor->value,
+            $int1 === ChordQuality::Major && $int2 === ChordQuality::Minor => ChordQuality::Major->value,
+            $int1 === ChordQuality::Major && $int2 === ChordQuality::Major => ChordQuality::Augmented->value,
+            $int1 === ChordQuality::Minor && $int2 === ChordQuality::Minor => ChordQuality::Diminished->value,
+            default => throw new \Exception("chord quality not found ???")
+        };
+    }
+
     /**
      * @param string[] $chord
      */
     private function analyzeChord(array $chord): string
     {
-        $allNotes = Note::cases();
-        $rootValue = array_search(Note::from($chord[0]), $allNotes);
+        $rootValue = array_search(Note::from($chord[0]), Note::cases());
         $thirdValue = $this->getInterval(Note::fromName($chord[1]), $rootValue);
         $fifthValue = $this->getInterval(Note::fromName($chord[2]), $rootValue);
-        $rootValue = 0;
 
-        $firstInterval = match (max($rootValue, $thirdValue) - min($rootValue, $thirdValue)) {
-            3 => ChordQuality::Minor,
-            4 => ChordQuality::Major,
-        };
-        $secondInterval = match (max($thirdValue, $fifthValue) - min($thirdValue, $fifthValue)) {
-            3 => ChordQuality::Minor,
-            4 => ChordQuality::Major,
-        };
+        $firstInterval = ChordQuality::getThirdQuality($thirdValue);
+        $secondInterval = ChordQuality::getThirdQuality($fifthValue - $thirdValue);
 
-        $chordQuality = "?";
-        if ($firstInterval === ChordQuality::Minor && $secondInterval === ChordQuality::Major) {
-            $chordQuality = ChordQuality::Minor->value;
-        } else if ($firstInterval === ChordQuality::Major && $secondInterval === ChordQuality::Minor) {
-            $chordQuality = ChordQuality::Major->value;
-        } else if ($firstInterval === ChordQuality::Major && $secondInterval === ChordQuality::Major) {
-            $chordQuality = ChordQuality::Augmented->value;
-        } else if ($firstInterval === ChordQuality::Minor && $secondInterval === ChordQuality::Minor) {
-            $chordQuality = ChordQuality::Diminished->value;
-        }
-        return $chord[0] . $chordQuality;
+        return $chord[0] . $this->getChordQuality($firstInterval, $secondInterval);
     }
 
     /**
