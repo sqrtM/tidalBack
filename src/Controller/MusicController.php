@@ -16,8 +16,8 @@ class MusicController extends AbstractController
     {
         $m = new ScaleFactory();
         $p = new Progression($m->new(ScaleName::Diatonic)->get());
-        $allChords = implode("|", $p->getAllChords());
-        $progression = implode("|", $p->generateProgression());
-        return new JsonResponse($allChords);
+        $prog = $p->generateProgression();
+        $progression = $p->analyzeProgression($prog);
+        return new JsonResponse($progression);
     }
 }

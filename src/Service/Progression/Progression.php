@@ -2,6 +2,7 @@
 
 namespace App\Service\Progression;
 
+use App\Notation\ChordQuality;
 use App\Notation\Note;
 
 class Progression
@@ -34,7 +35,7 @@ class Progression
         return $prog;
     }
 
-    public function generateProgression()
+    public function generateProgression(): array
     {
         $prog = [$this->allChords[0],];
         array_push($prog, $this->allChords[$this->MEDIANTS[array_rand($this->MEDIANTS)]]);
@@ -48,8 +49,56 @@ class Progression
         return $this->allChords;
     }
 
-    public function analyzeProgression(array $prog)
+    private function getInterval(Note $n1, int $root): int
+    {  
+        return array_search($n1, Note::cases()) - $root <= 0 
+        ? array_search($n1, Note::cases()) - $root + 12 
+        : array_search($n1, Note::cases()) - $root;
+    }
+
+    /**
+     * @param string[] $chord
+     */
+    private function analyzeChord(array $chord): string
     {
         $allNotes = Note::cases();
+        $rootValue = array_search(Note::from($chord[0]), $allNotes);
+        $thirdValue = $this->getInterval(Note::fromName($chord[1]), $rootValue);
+        $fifthValue = $this->getInterval(Note::fromName($chord[2]), $rootValue);
+        $rootValue = 0;
+
+        $firstInterval = match (max($rootValue, $thirdValue) - min($rootValue, $thirdValue)) {
+            3 => ChordQuality::Minor,
+            4 => ChordQuality::Major,
+        };
+        $secondInterval = match (max($thirdValue, $fifthValue) - min($thirdValue, $fifthValue)) {
+            3 => ChordQuality::Minor,
+            4 => ChordQuality::Major,
+        };
+
+        $chordQuality = "?";
+        if ($firstInterval === ChordQuality::Minor && $secondInterval === ChordQuality::Major) {
+            $chordQuality = ChordQuality::Minor->value;
+        } else if ($firstInterval === ChordQuality::Major && $secondInterval === ChordQuality::Minor) {
+            $chordQuality = ChordQuality::Major->value;
+        } else if ($firstInterval === ChordQuality::Major && $secondInterval === ChordQuality::Major) {
+            $chordQuality = ChordQuality::Augmented->value;
+        } else if ($firstInterval === ChordQuality::Minor && $secondInterval === ChordQuality::Minor) {
+            $chordQuality = ChordQuality::Diminished->value;
+        }
+        return $chord[0] . $chordQuality;
+    }
+
+    /**
+     * @param string[] $prog 
+     */
+    public function analyzeProgression(array $prog): string
+    {
+        $analyzedProgression = "|";
+        foreach ($prog as $chord) {
+            $testChord = explode(",", $chord);
+            $analyzedProgression .= $this->analyzeChord($testChord) . "|";
+        }
+        return $analyzedProgression;
     }
 }

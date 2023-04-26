@@ -16,4 +16,14 @@ enum Note: string
     case A = "A";
     case As = "As";
     case B = "B";
+
+    public static function fromName(string $name)
+    {
+        foreach (self::cases() as $note) {
+            if( $name === $note->name ){
+                return $note;
+            }
+        }
+        throw new \ValueError("$name is not a valid backing value for enum " . self::class );
+    }
 }
